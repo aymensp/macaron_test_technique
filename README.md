@@ -7,12 +7,9 @@
 
 ![ezgif com-crop(1)](https://github.com/aymensp/macaron_test_technique/blob/master/media/filterByArrondiss.gif)
 
- ### Filter Scene Location By Year 
+### Filter Scene Location By Year 
  
- ![ezgif com-crop(1)](https://github.com/aymensp/macaron_test_technique/blob/master/media/filterByYear.gif)
- 
-  
-<img src="https://github.com/aymensp/Gmail-Clone-ReactJs/blob/master/media/MailList.png" height="500" /> 
+![ezgif com-crop(1)](https://github.com/aymensp/macaron_test_technique/blob/master/media/filterByYear.gif)
  
 
 ### Created & Maintained By
