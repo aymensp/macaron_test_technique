@@ -8,9 +8,7 @@ var Points;
 router.post("/filteredPoints", function (req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const filters = req.body.params;
-  console.log(filters)
   const { arrondissement } = req.body;
-
 
   reader = fs.readFile(
     __dirname + "/arrondissements.geojson",
@@ -49,7 +47,6 @@ router.post("/filteredPoints", function (req, res) {
       );
     }
   );
-
 });
 
 router.get("/polygons", function (req, res) {

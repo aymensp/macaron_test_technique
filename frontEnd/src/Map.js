@@ -73,7 +73,6 @@ function Map() {
         },
       })
       .then((data) => {
-        console.log(data);
         setPoints(data.data);
       })
       .catch((error) => console.log(error));
@@ -92,7 +91,6 @@ function Map() {
         mapStyle="mapbox://styles/aymannn/cktn2lof5anwb17p59etlltoi"
         mapboxApiAccessToken="pk.eyJ1IjoiYXltYW5ubiIsImEiOiJja3BuZHVrZ2QybzM2MndyaXEwamxuZDVqIn0.6GM7CF90UWngIGU66viGDw"
         onViewportChange={(viewport) => setViewport(viewport)}
-        onClick={() => console.log("hnin")}
       >
         {points.map((point, i) => (
           <div key={i}>
