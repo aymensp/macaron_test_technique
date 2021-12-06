@@ -8,13 +8,62 @@ import MapGL, {
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
+  LinearInterpolator,
+  WebMercatorViewport,
 } from "react-map-gl";
+import bbox from "@turf/bbox";
+import Select from "react-select";
 import { useEffect, useState } from "react";
 import "./Map.css";
 import axios from "axios";
 import { dataLayer } from "./map-style.js";
 
 function Map() {
+  const [points, setPoints] = useState([]);
+  const [arrOptions, setarrOptions] = useState([]);
+  const [polygons, setPolygons] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedYear, setSelectedYear] = useState({
+    value: undefined,
+    label: undefined,
+  });
+  const onClick = (event) => {
+    const feature = event.features[0];
+    console.log(event.features[0]);
+    if (feature) {
+      // calculate the bounding box of the feature
+      const [minLng, minLat, maxLng, maxLat] = bbox(feature);
+      // construct a viewport instance from the current state
+      const vp = new WebMercatorViewport(viewport);
+      const { longitude, latitude, zoom } = vp.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat],
+        ],
+        {
+          padding: 20,
+        }
+      );
+
+      setViewport({
+        ...viewport,
+        longitude,
+        latitude,
+        zoom,
+        transitionInterpolator: new LinearInterpolator({
+          around: [event.offsetCenter.x, event.offsetCenter.y],
+        }),
+        transitionDuration: 1000,
+      });
+    }
+  };
+  const [arrondissement, setArrondissement] = useState({
+    value: 1,
+    label: "arrondissement n° : 1",
+  });
+  const [params, setParams] = useState({
+    annee_tournage: undefined,
+  });
   const geolocateStyle = {
     top: 0,
     left: 0,
@@ -38,9 +87,7 @@ function Map() {
     left: 0,
     padding: "10px",
   };
-  const [points, setPoints] = useState([]);
-  const [polygons, setPolygons] = useState([]);
-  const [selectedPlace, setSelectedPlace] = useState(null);
+
   const [viewport, setViewport] = useState({
     latitude: 48.8625627018,
     longitude: 2.33644336205,
@@ -48,11 +95,25 @@ function Map() {
     height: "95vh",
     zoom: 12,
   });
-
   useEffect(() => {
     getPolygons();
     getPointsByPolygon();
-  }, []);
+  }, [arrondissement, params]);
+  useEffect(() => {
+    if (polygons.features)
+      setarrOptions(
+        polygons.features
+          .map((place) => {
+            return {
+              value: place.properties.c_ar,
+              label: "arrondissemet n° :" + place.properties.c_ar,
+            };
+          })
+          .sort((a, b) => {
+            return a.value - b.value;
+          })
+      );
+  }, [polygons]);
 
   const getPolygons = () => {
     axios
@@ -66,31 +127,59 @@ function Map() {
   const getPointsByPolygon = () => {
     axios
       .post(`http://localhost:9000/get/filteredPoints`, {
-        arrondissement: 1,
-        params: {
-          annee_tournage: 2016,
-          date_debut: "2016-12-07",
-        },
+        arrondissement: arrondissement.value,
+        params,
       })
       .then((data) => {
         setPoints(data.data);
       })
       .catch((error) => console.log(error));
   };
+  // const handleFilterChange = (type, value) => {
+  //   if (type === "annee") {
+  //     setAnne;
+  //   }
+  // };
+
+  const AnneOptions = [
+    { value: 2016, label: "2016" },
+    { value: 2017, label: "2017" },
+    { value: 2018, label: "2018 " },
+    { value: 2019, label: "2019 " },
+    { value: 2020, label: "2020 " },
+  ];
 
   return (
     <div>
       <div className="top_bar ">
-        <p className="button">Arrondissement</p>
-        <p className="button">Annee De Tournage</p>
-        <p className="button">Date Debut De tournage</p>
-        <p className="button">Date Fin De tournage</p>
+        <Select
+          className="button"
+          name="annee"
+          isSearchable={false}
+          options={AnneOptions}
+          onChange={(value) => {
+            setParams({ annee_tournage: value.value });
+            setSelectedYear(value);
+          }}
+        />
+
+        <Select
+          className="button"
+          name="arrondissement"
+          defaultValue={arrondissement}
+          options={arrOptions}
+          value={arrondissement}
+          onChange={(arrondissement) => {
+            setArrondissement(arrondissement);
+          }}
+        />
       </div>
       <MapGL
         {...viewport}
         mapStyle="mapbox://styles/aymannn/cktn2lof5anwb17p59etlltoi"
         mapboxApiAccessToken="pk.eyJ1IjoiYXltYW5ubiIsImEiOiJja3BuZHVrZ2QybzM2MndyaXEwamxuZDVqIn0.6GM7CF90UWngIGU66viGDw"
         onViewportChange={(viewport) => setViewport(viewport)}
+        onClick={onClick}
       >
         {points.map((point, i) => (
           <div key={i}>
