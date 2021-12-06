@@ -27,9 +27,16 @@ function Map() {
     value: undefined,
     label: undefined,
   });
-  const onClick = (event) => {
-    const feature = event.features[0];
-    console.log(event.features[0]);
+  const [arrondissement, setArrondissement] = useState({
+    value: 1,
+    label: "arrondissement n° : 1",
+  });
+  const onClick = (numero) => {
+    console.log(numero)
+    const feature = polygons.features
+      .filter((place) => place.properties.c_ar === numero)
+      .shift();
+    console.log(feature);
     if (feature) {
       // calculate the bounding box of the feature
       const [minLng, minLat, maxLng, maxLat] = bbox(feature);
@@ -50,17 +57,14 @@ function Map() {
         longitude,
         latitude,
         zoom,
-        transitionInterpolator: new LinearInterpolator({
-          around: [event.offsetCenter.x, event.offsetCenter.y],
-        }),
+        // transitionInterpolator: new LinearInterpolator({
+        //   around: [event.offsetCenter.x, event.offsetCenter.y],
+        // }),
         transitionDuration: 1000,
       });
     }
   };
-  const [arrondissement, setArrondissement] = useState({
-    value: 1,
-    label: "arrondissement n° : 1",
-  });
+
   const [params, setParams] = useState({
     annee_tournage: undefined,
   });
@@ -171,6 +175,7 @@ function Map() {
           value={arrondissement}
           onChange={(arrondissement) => {
             setArrondissement(arrondissement);
+            onClick(arrondissement.value);
           }}
         />
       </div>
