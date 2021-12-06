@@ -1,0 +1,42 @@
+.pin__selected {
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  background-color: red;
+  border-radius: 8px 8px 0px 8px;
+  position: relative;
+  transform: rotate(45deg);
+  z-index: 5;
+}
+.pin__selected::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: rgb(99, 5, 5);
+  position: absolute;
+  left: 26%;
+  top: 26%;
+  border-radius: 10px;
+}
+.popup {
+  z-index: 50;
+}
+.button {
+  margin: 10px;
+  padding: 8px;
+  cursor: pointer;
+  color: black;
+  font-size: 18px;
+  border-radius: 22px;
+  border: solid 1px rgb(185, 179, 179);
+}
+.top_bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: white;
+  box-shadow: 0px 4px 12px gray;
+}
